@@ -1,0 +1,72 @@
+# filename reasoning https://docs.docker.com/compose/compose-file/03-compose-file/#compose-file
+services:
+  php:
+    image: ${PROJECT}php
+    build:
+      context: ../images/php
+      args:
+        HOST_UID: ${HOST_UID}
+        HOST_GID: ${HOST_GID}
+    container_name: ${PROJECT}php
+    networks:
+      - ${PROJECT}network
+    volumes:
+      - ../../src:/var/www/html
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+  nginx:
+    image: ${PROJECT}nginx
+    build:
+      context: ../images/nginx
+    container_name: ${PROJECT}nginx
+    networks:
+      - ${PROJECT}network
+    volumes:
+      - ../../src:/var/www/html
+      - ./conf.d:/etc/nginx/conf.d
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - php
+    ports:
+      - 80:80
+      - 443:443
+    restart: unless-stopped
+  node:
+    image: ${PROJECT}node
+    build:
+      context: ../images/node
+      args:
+        HOST_UID: ${HOST_UID}
+        HOST_GID: ${HOST_GID}
+    container_name: ${PROJECT}node
+    networks:
+      - ${PROJECT}network
+    volumes:
+      - ../../src:/var/www/html
+  postgres:
+    image: postgres:15-bookworm
+    container_name: ${PROJECT}postgres
+    environment:
+      POSTGRES_PASSWORD: 'Bqox56ewGRxrUY5MzFUNx0w23AXN0MY9'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - ${PROJECT}network
+#  redis:
+#    image: redis:7-bookworm
+#    container_name: ${PROJECT}redis
+#    networks:
+#      - ${PROJECT}network
+#    restart: unless-stopped
+#    volumes:
+#      - redis_data:/data
+volumes:
+  postgres_data:
+    name: ${PROJECT}postgres_data
+#  redis_data:
+#    name: ${PROJECT}redis_data
