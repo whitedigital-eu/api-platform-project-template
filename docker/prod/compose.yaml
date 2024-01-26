@@ -7,6 +7,7 @@ services:
       args:
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
+        PHP_VERSION: '8.3'
     container_name: ${PROJECT}php
     networks:
       - ${PROJECT}network
@@ -42,6 +43,7 @@ services:
       args:
         HOST_UID: ${HOST_UID}
         HOST_GID: ${HOST_GID}
+        NODE_VERSION: '20'
     container_name: ${PROJECT}node
     networks:
       - ${PROJECT}network
@@ -57,16 +59,6 @@ services:
     restart: unless-stopped
     networks:
       - ${PROJECT}network
-#  redis:
-#    image: redis:7-bookworm
-#    container_name: ${PROJECT}redis
-#    networks:
-#      - ${PROJECT}network
-#    restart: unless-stopped
-#    volumes:
-#      - redis_data:/data
 volumes:
   postgres_data:
     name: ${PROJECT}postgres_data
-#  redis_data:
-#    name: ${PROJECT}redis_data

@@ -1,5 +1,8 @@
-FROM node:18-bookworm-slim
+ARG NODE_VERSION=20
+FROM node:${NODE_VERSION}-bookworm-slim
 
+#=======================================================================================================================
+# PERMISSIONS
 ARG HOST_UID
 ARG HOST_GID
 
@@ -9,7 +12,6 @@ RUN username=$(echo $(getent passwd $HOST_UID | cut -d: -f1)) \
       userdel $username; \
     fi \
     && usermod -u $HOST_UID node
-
 # set host HOST GID to node group
 RUN groupname=$(echo $(getent group $HOST_GID | cut -d: -f1)) \
     && if [[ $groupname != '' ]] && [[ $groupname != 'node' ]]; then \
@@ -17,11 +19,17 @@ RUN groupname=$(echo $(getent group $HOST_GID | cut -d: -f1)) \
     fi \
     && groupmod -g $HOST_GID node
 
-# update system and install tools
-RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends vim
+#=======================================================================================================================
+# SYSTEM UPDATE
+RUN apt-get update && apt-get upgrade -y
 
-# set default working dir
+#=======================================================================================================================
+# DIRECTORY SETUP
 WORKDIR /var/www/html/portal
 
-# set default user
+#=======================================================================================================================
+# ADDITIONAL PROJECT SPECIFIC STEPS
+# here goes anything that is not covered by the above steps
+
+#=======================================================================================================================
 USER node
